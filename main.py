@@ -1,0 +1,51 @@
+from fastapi import FastAPI
+from datetime import datetime
+import pandas as pd
+from services.geo_utils import find_nearest_station
+from services.forecast_service import (
+    compute_baseline,
+    generate_24h_forecast,
+    generate_72h_forecast
+)
+from services.waqi_service import fetch_station_coordinates, fetch_live_aqi
+
+
+app = FastAPI()
+
+# Load dataset once
+df = pd.read_csv("data/aqi_dataset.csv")
+
+stations_df = df[["latitude", "longitude"]].drop_duplicates()
+
+
+@app.get("/forecast")
+def forecast(station: str):
+
+    coords = fetch_station_coordinates(station)
+
+    if coords is None:
+        return {"error": "Station not found"}
+
+    lat, lon = coords
+
+    nearest = find_nearest_station(lat, lon, stations_df)
+
+    station_df = df[
+        (df["latitude"] == nearest["latitude"]) &
+        (df["longitude"] == nearest["longitude"])
+    ]
+
+    live_aqi = fetch_live_aqi(lat, lon)
+
+    current_month = datetime.now().month
+    baseline = compute_baseline(station_df, current_month)
+
+    forecast_24h = generate_24h_forecast(live_aqi, baseline)
+    forecast_72h = generate_72h_forecast(live_aqi, baseline)
+
+    return {
+        "station": station,
+        "current_aqi": live_aqi,
+        "forecast_24h": forecast_24h,
+        "forecast_72h": forecast_72h
+    }
