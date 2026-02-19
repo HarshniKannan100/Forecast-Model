@@ -1,6 +1,8 @@
+from datetime import datetime
+import pandas as pd
 import requests
 import os
-TOKEN = os.getenv("TOKEN")
+TOKEN = "5d884a451880e821b8e4c7ed3a8727ce0eb30650"
 
 def fetch_station_coordinates(station_name: str):
     url = f"https://api.waqi.info/search/?token={TOKEN}&keyword={station_name}"
@@ -36,12 +38,28 @@ def fetch_live_aqi(lat, lon):
         "so2": iaqi.get("so2", {}).get("v"),
     }
 
-def cigarettes_last_7_days(station_df):
+def cigarettes_last_7_days(station_df, live_data):
 
-    last7 = station_df.sort_values("datetime").tail(7)
+    # sort history
+    station_df = station_df.sort_values("datetime")
 
+    # 27 historical + live
+    hist_last = station_df.tail(27)
+
+    live_row = pd.DataFrame([{
+        "pm25": live_data["pm25"],
+        "datetime": datetime.now()
+    }])
+
+    last7 = pd.concat([hist_last, live_row])
+
+    # average PM2.5
     avg_pm25 = last7["pm25"].mean()
 
-    cigarettes = (avg_pm25 / 22) * 7
+    # cigarettes per day
+    cigs_day = avg_pm25 / 22
 
-    return round(cigarettes, 1)
+    # weekly cigarettes
+    cigs_week = cigs_day * 7
+
+    return round(cigs_day, 1), round(cigs_week, 1)
