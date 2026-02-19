@@ -19,10 +19,19 @@ def fetch_station_coordinates(station_name: str):
 
 def fetch_live_aqi(lat, lon):
     url = f"https://api.waqi.info/feed/geo:{lat};{lon}/?token={TOKEN}"
-    response = requests.get(url).json()
 
-    if response["status"] == "ok":
-        return response["data"]["aqi"]
-    else:
+    res = requests.get(url).json()
+
+    if res["status"] != "ok":
         return None
-    
+
+    data = res["data"]
+    iaqi = data.get("iaqi", {})
+
+    return {
+        "aqi": data.get("aqi"),
+        "pm25": iaqi.get("pm25", {}).get("v"),
+        "pm10": iaqi.get("pm10", {}).get("v"),
+        "no2": iaqi.get("no2", {}).get("v"),
+        "so2": iaqi.get("so2", {}).get("v"),
+    }

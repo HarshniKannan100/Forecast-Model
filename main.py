@@ -35,17 +35,20 @@ def forecast(station: str):
         (df["longitude"] == nearest["longitude"])
     ]
 
-    live_aqi = fetch_live_aqi(lat, lon)
 
     current_month = datetime.now().month
+    live_data = fetch_live_aqi(lat, lon)
+
+    current_aqi = live_data["aqi"]   # ⭐ extract number
+
     baseline = compute_baseline(station_df, current_month)
 
-    forecast_24h = generate_24h_forecast(live_aqi, baseline)
-    forecast_72h = generate_72h_forecast(live_aqi, baseline)
+    forecast_24h = generate_24h_forecast(current_aqi, baseline)
+    forecast_72h = generate_72h_forecast(current_aqi, baseline)
 
     return {
-        "station": station,
-        "current_aqi": live_aqi,
-        "forecast_24h": forecast_24h,
-        "forecast_72h": forecast_72h
-    }
+    "station": station,
+    "current": live_data,   # full dict
+    "forecast_24h": forecast_24h,
+    "forecast_72h": forecast_72h   
+    }   
