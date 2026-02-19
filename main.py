@@ -7,7 +7,7 @@ from services.forecast_service import (
     generate_24h_forecast,
     generate_72h_forecast
 )
-from services.waqi_service import fetch_station_coordinates, fetch_live_aqi
+from services.waqi_service import fetch_station_coordinates, fetch_live_aqi, cigarettes_last_7_days
 
 
 app = FastAPI()
@@ -45,10 +45,12 @@ def forecast(station: str):
 
     forecast_24h = generate_24h_forecast(current_aqi, baseline)
     forecast_72h = generate_72h_forecast(current_aqi, baseline)
+    cigs_7d = cigarettes_last_7_days(station_df)
 
     return {
     "station": station,
     "current": live_data,   # full dict
     "forecast_24h": forecast_24h,
-    "forecast_72h": forecast_72h   
+    "forecast_72h": forecast_72h,
+    "cigarettes_7d": cigs_7d 
     }  

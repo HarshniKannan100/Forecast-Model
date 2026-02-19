@@ -35,3 +35,13 @@ def fetch_live_aqi(lat, lon):
         "no2": iaqi.get("no2", {}).get("v"),
         "so2": iaqi.get("so2", {}).get("v"),
     }
+
+def cigarettes_last_7_days(station_df):
+
+    last7 = station_df.sort_values("datetime").tail(7)
+
+    avg_pm25 = last7["pm25"].mean()
+
+    cigarettes = (avg_pm25 / 22) * 7
+
+    return round(cigarettes, 1)
