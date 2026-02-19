@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+import requests
 from datetime import datetime
 import pandas as pd
 from services.geo_utils import find_nearest_station
@@ -9,7 +10,7 @@ from services.forecast_service import (
 )
 from services.waqi_service import fetch_station_coordinates, fetch_live_aqi, cigarettes_last_7_days
 from fastapi.middleware.cors import CORSMiddleware
-
+TOKEN = "5d884a451880e821b8e4c7ed3a8727ce0eb30650"
 app = FastAPI()
 
 
@@ -62,3 +63,10 @@ def forecast(station: str):
     "forecast_72h": forecast_72h,
     "cigarettes_7d": cigs_7d 
     }  
+
+@app.get("/delhi-stations")
+def delhi():
+    r = requests.get(
+        f"https://api.waqi.info/search/?token={TOKEN}&keyword=delhi"
+    )
+    return r.json()
