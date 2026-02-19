@@ -36,6 +36,8 @@ def fetch_live_aqi(lat, lon):
         "pm10": iaqi.get("pm10", {}).get("v"),
         "no2": iaqi.get("no2", {}).get("v"),
         "so2": iaqi.get("so2", {}).get("v"),
+        "o3": iaqi.get("o3", {}).get("v"),
+        "co": iaqi.get("co", {}).get("v"),
     }
 
 def cigarettes_last_7_days(station_df, live_data):
