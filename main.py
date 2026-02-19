@@ -51,4 +51,4 @@ def forecast(station: str):
     "current": live_data,   # full dict
     "forecast_24h": forecast_24h,
     "forecast_72h": forecast_72h   
-    }   
+    }  

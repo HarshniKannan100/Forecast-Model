@@ -1,6 +1,6 @@
 import requests
-
-TOKEN = "5d884a451880e821b8e4c7ed3a8727ce0eb30650"
+import os
+TOKEN = os.getenv("TOKEN")
 
 def fetch_station_coordinates(station_name: str):
     url = f"https://api.waqi.info/search/?token={TOKEN}&keyword={station_name}"
